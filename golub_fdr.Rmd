@@ -1,0 +1,69 @@
+---
+title: "Golub"
+output: html_document
+date: "2025-03-20"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load & QC
+
+```{r}
+dim(golub)
+class(golub)
+class(golub.cl)
+length(golub.cl)
+
+dim(golub.gnames)
+class(golub.gnames)
+head(golub.gnames)
+
+# mean value
+row_m = rowMeans(golub)
+plot(row_m)
+hist(row_m, nclass = 30)
+
+
+# dispersion
+row_sd = apply(golub, 1, sd)
+plot(row_sd)
+hist(row_sd, nclass = 30)
+
+row_sd_q = quantile(row_sd, probs = c(0.25, 0.50, 0.75))
+
+abline(v = row_sd_q, col ="red2", lwd = 2)
+```
+
+```{r}
+golub.cl
+golub[1,]
+
+boxplot(golub.cl, golub[1,])
+
+res = t.test(golub.cl, golub[1,])
+str(res)
+res$p.value
+
+
+score = function(i) {
+  res = t.test(golub.cl, golub[i,])
+  return(res$p.value)
+}
+
+# verify value
+score(1)
+# verify that the function is indepedent of the data used during the development
+score(10)
+
+
+# apply on all rows
+row_scores = NULL
+for (i in 1:nrow(golub)) {
+  row_scores[i] = score(i)
+}
+
+
+```
+

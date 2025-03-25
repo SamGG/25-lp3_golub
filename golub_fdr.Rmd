@@ -221,3 +221,73 @@ which(score_simul1 < 5/100)
 table(score_simul1 < 5/100, 1:length(score_simul1) <= 300)
 ```
 
+```{r}
+hist(score_simul1, breaks = 20, col = "#0088CC44")
+hist(score_simul0, breaks = 20, col = "#8800CC44", add = TRUE)
+
+# recuperation des comptages
+hh1 = hist(score_simul1, breaks = 20, plot = FALSE)
+hh1$counts
+hh1$breaks
+# moyenne des comptages de 5 a 20, c'est a dire p-value > 0.20
+
+FP = mean(hh1$counts[5:20])
+D = hh1$counts[1]
+FDR = FP / D
+
+cat(FDR)
+```
+
+
+## passage de 5% a 2%
+
+```{r}
+hh50 = hist(score_simul1, breaks = 100/2, plot = TRUE)
+
+# moyenne des comptages de 5 a 20, c'est a dire p-value > 0.20
+indices_fp = hh50$mids
+FP = mean(hh1$counts[indices_fp])
+D = hh1$counts[1]
+FDR = FP / D
+
+cat(FDR)
+
+
+# fonction
+# calcul_fdr
+# description
+# calcul du False Discovery Rate
+# entrees
+# vecteur des p-values
+# seuil de p-value
+# seuil de p-value des faux positifs
+# sorties
+# le FDR
+# le nombre de decouvertes
+
+calcul_fdr <- function(
+    p_values,
+    seuil_pvalues,
+    seuil_pvalues_fp = 0.2
+) {
+  hh = hist(p_values, breaks = 1/seuil_pvalues, plot = FALSE)
+  FP = mean(hh$counts[hh$mid > seuil_pvalues_fp])
+  D = hh$counts[1]
+  FDR = FP / D
+  return(list(
+     fdr = FDR,
+     nb_decouvertes = D))  
+}
+
+calcul_fdr(score_simul1, 0.02, 0.2)
+calcul_fdr(score_simul1, 0.05, 0.2)
+
+
+calcul_fdr(score_simul1, 0.05)
+
+# (aa  = -5:5)
+# aa[aa<-1]
+# aa
+```
+
+
